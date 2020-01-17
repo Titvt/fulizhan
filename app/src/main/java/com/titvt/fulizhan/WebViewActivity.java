@@ -22,12 +22,7 @@ public class WebViewActivity extends Fragment {
         wv.getSettings().setJavaScriptEnabled(true);
         wv.setWebViewClient(new WebViewClient());
         wv.setLongClickable(true);
-        wv.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                return true;
-            }
-        });
+        wv.setOnLongClickListener(v -> true);
         wv.loadUrl("https://www.titvt.com/flz/main.html");
         return view;
     }

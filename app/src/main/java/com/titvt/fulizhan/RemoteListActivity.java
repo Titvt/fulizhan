@@ -1,7 +1,15 @@
 package com.titvt.fulizhan;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,41 +31,30 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class RemoteListActivity extends Fragment {
-    private MyAdapter myAdapter;
+    private RemoteListAdapter remoteListAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_remote_list, container, false);
-        view.findViewById(R.id.btn_refresh).setOnClickListener(v -> {
-            myAdapter.clearHost();
-            myAdapter.notifyDataSetChanged();
-            for (int i = 0; i < 256; i++)
-                new MyThread("192.168." + i + ".").start();
-        });
-        view.findViewById(R.id.btn_back).setOnClickListener(v -> {
-
+        view.findViewById(R.id.btn_get_exe).setOnClickListener(v -> {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.titvt.com/flz/fulizhan.exe")));
         });
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        myAdapter = new MyAdapter();
-        rv.setAdapter(myAdapter);
+        remoteListAdapter = new RemoteListAdapter();
+        rv.setAdapter(remoteListAdapter);
         for (int i = 0; i < 256; i++)
-            new MyThread("192.168." + i + ".").start();
+            new RemoteListThread("192.168." + i + ".").start();
         return view;
     }
 
-    class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+    class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.MyViewHolder> {
         ArrayList<Hosts> hosts = new ArrayList<>();
 
         void addHost(Hosts hosts) {
             this.hosts.add(hosts);
-            notifyItemChanged(getItemCount());
-        }
-
-        void clearHost() {
-            for (int i = hosts.size(); i > 0; i--)
-                hosts.remove(i - 1);
+            notifyItemInserted(getItemCount() - 1);
         }
 
         @NonNull
@@ -70,7 +67,18 @@ public class RemoteListActivity extends Fragment {
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             holder.hostName.setText(hosts.get(position).hostName);
             holder.host.setText(hosts.get(position).host);
-            holder.thumb.setImageBitmap(BitmapFactory.decodeByteArray(hosts.get(position).bytes, 0, hosts.get(position).bytes.length));
+            Bitmap bitmap = BitmapFactory.decodeByteArray(hosts.get(position).bytes, 0, hosts.get(position).bytes.length),
+                    thumb = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(thumb);
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setColor(0xff000000);
+            Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawARGB(0, 0, 0, 0);
+            canvas.drawRoundRect(new RectF(rect), 100, 100, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, rect, rect, paint);
+            holder.thumb.setImageBitmap(thumb);
         }
 
         @Override
@@ -110,10 +118,10 @@ public class RemoteListActivity extends Fragment {
         }
     }
 
-    class MyThread extends Thread {
-        String prefix;
+    class RemoteListThread extends Thread {
+        private String prefix;
 
-        MyThread(String prefix) {
+        RemoteListThread(String prefix) {
             this.prefix = prefix;
         }
 
@@ -139,7 +147,7 @@ public class RemoteListActivity extends Fragment {
                         byteArrayOutputStream.write(bytes, 0, num);
                         size -= num;
                     } while (size != 0);
-                    myAdapter.addHost(new Hosts(hostName, prefix + i, byteArrayOutputStream.toByteArray()));
+                    remoteListAdapter.addHost(new Hosts(hostName, prefix + i, byteArrayOutputStream.toByteArray()));
                 } catch (Exception ignored) {
                 }
             }

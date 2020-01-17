@@ -20,33 +20,15 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_get_exe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp">
-
-        <Button
-            android:id="@+id/btn_refresh"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/button"
-            android:text="@string/refresh"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/button"
-            android:text="@string/back"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
-
-    </LinearLayout>
+        android:layout_margin="10dp"
+        android:background="@drawable/button"
+        android:text="@string/get_exe"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </LinearLayout>

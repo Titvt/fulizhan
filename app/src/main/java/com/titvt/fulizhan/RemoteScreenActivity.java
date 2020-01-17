@@ -9,9 +9,11 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,26 +24,26 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-public class RemoteScreenActivity extends AppCompatActivity {
+public class RemoteScreenActivity extends AppCompatActivity implements View.OnClickListener {
+    ImageView iv;
     Socket socket;
     String host = "localhost";
-    MyHandler handler;
+    RemoteScreenHandler remoteScreenHandler;
     GestureDetector gestureDetector;
     ScaleGestureDetector scaleGestureDetector;
     float scaleFactor = 1.0f;
     int screenWidth, screenHeight, targetWidth, targetHeight;
     long deltaTime = 0;
-    @BindView(R.id.iv)
-    ImageView iv;
+    boolean shift_on = false,
+            ctrl_on = false,
+            win_on = false,
+            alt_on = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remote_screen);
-        ButterKnife.bind(this);
+        iv = findViewById(R.id.iv);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Bundle bundle = getIntent().getBundleExtra("bundle");
         if (bundle != null)
@@ -52,7 +54,7 @@ public class RemoteScreenActivity extends AppCompatActivity {
         screenHeight = point.y;
         gestureDetector = new GestureDetector(this, new OnGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new OnScaleGestureListener());
-        handler = new MyHandler(iv);
+        remoteScreenHandler = new RemoteScreenHandler(iv);
         new SocketThread().start();
     }
 
@@ -65,6 +67,54 @@ public class RemoteScreenActivity extends AppCompatActivity {
                 return true;
             }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.keyboard_open:
+                findViewById(R.id.keyboard).setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
+                break;
+            case R.id.keyboard_close:
+                findViewById(R.id.keyboard).setVisibility(View.GONE);
+                findViewById(R.id.keyboard_open).setVisibility(View.VISIBLE);
+                break;
+            case R.id.keyboard_Shift:
+                new SocketSender(2, ((Button) view).getText().toString()).start();
+                if (shift_on)
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard));
+                else
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard_down));
+                shift_on = !shift_on;
+                break;
+            case R.id.keyboard_Ctrl:
+                new SocketSender(2, ((Button) view).getText().toString()).start();
+                if (ctrl_on)
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard));
+                else
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard_down));
+                ctrl_on = !ctrl_on;
+                break;
+            case R.id.keyboard_Win:
+                new SocketSender(2, ((Button) view).getText().toString()).start();
+                if (win_on)
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard));
+                else
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard_down));
+                win_on = !win_on;
+                break;
+            case R.id.keyboard_Alt:
+                new SocketSender(2, ((Button) view).getText().toString()).start();
+                if (alt_on)
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard));
+                else
+                    view.setBackground(getResources().getDrawable(R.drawable.keyboard_down));
+                alt_on = !alt_on;
+                break;
+            default:
+                new SocketSender(2, ((Button) view).getText().toString()).start();
+        }
     }
 
     @Override
@@ -123,7 +173,7 @@ public class RemoteScreenActivity extends AppCompatActivity {
             scaleFactor *= detector.getScaleFactor();
             Point point = new Point();
             getWindowManager().getDefaultDisplay().getSize(point);
-            iv.setLayoutParams(new LinearLayout.LayoutParams((int) (point.x * scaleFactor), (int) (point.y * scaleFactor)));
+            iv.setLayoutParams(new FrameLayout.LayoutParams((int) (point.x * scaleFactor), (int) (point.y * scaleFactor)));
             return true;
         }
 
@@ -138,10 +188,10 @@ public class RemoteScreenActivity extends AppCompatActivity {
         }
     }
 
-    static class MyHandler extends Handler {
+    static class RemoteScreenHandler extends Handler {
         ImageView iv;
 
-        MyHandler(ImageView iv) {
+        RemoteScreenHandler(ImageView iv) {
             this.iv = iv;
         }
 
@@ -184,6 +234,9 @@ public class RemoteScreenActivity extends AppCompatActivity {
                     case 1:
                         dataOutputStream.writeInt(((Point) object).x);
                         dataOutputStream.writeInt(((Point) object).y);
+                        break;
+                    case 2:
+                        dataOutputStream.writeUTF((String) object);
                 }
                 dataOutputStream.flush();
             } catch (Exception ignored) {
@@ -216,7 +269,7 @@ public class RemoteScreenActivity extends AppCompatActivity {
                     } while (size != 0);
                     message = new Message();
                     message.obj = byteArrayOutputStream.toByteArray();
-                    handler.sendMessage(message);
+                    remoteScreenHandler.sendMessage(message);
                 }
             } catch (Exception ignored) {
             }

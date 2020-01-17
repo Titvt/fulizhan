@@ -1,11 +1,13 @@
 package com.titvt.fulizhan;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,31 +18,29 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity {
     private static final int version = 2;
     Fragment home = new HomeActivity(),
             web_view = new WebViewActivity(),
             remote_list = new RemoteListActivity(),
+            ai = new AIActivity(),
             current;
-    @BindView(R.id.drawerlayout)
     DrawerLayout drawerLayout;
-    @BindView(R.id.navigation)
-    NavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).commit();
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).add(R.id.fragment, ai).hide(ai).commit();
         current = home;
+        drawerLayout = findViewById(R.id.drawerlayout);
+        NavigationView navigation = findViewById(R.id.navigation);
         navigation.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_home:
@@ -55,8 +55,18 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction().hide(current).show(remote_list).commit();
                     current = remote_list;
                     break;
+                case R.id.menu_ai:
+                    getSupportFragmentManager().beginTransaction().hide(current).show(ai).commit();
+                    current = ai;
+                    break;
+                case R.id.menu_info:
+                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.14").show();
+                    break;
                 case R.id.menu_github:
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Titvt")));
+                    break;
+                case R.id.menu_exit:
+                    android.os.Process.killProcess(android.os.Process.myPid());
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
@@ -76,36 +86,29 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
             drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+        else
+            drawerLayout.openDrawer(GravityCompat.START);
+
+        return true;
     }
 
     void checkVersion() {
         try {
-            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL("https://www.titvt.com/flz/version.php").openConnection();
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setConnectTimeout(1000);
-            httpURLConnection.setReadTimeout(1000);
-            httpURLConnection.setDoInput(true);
-            httpURLConnection.connect();
-            if (httpURLConnection.getResponseCode() == 200) {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-                if (Integer.parseInt(bufferedReader.readLine()) > version) {
-                    final String latestUri = bufferedReader.readLine(),
-                            latestInfo = bufferedReader.readLine();
-                    Looper.prepare();
-                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(latestUri)));
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                        }
-                    }).setTitle("发现新版本").setMessage(latestInfo).setCancelable(false).show();
-                    Looper.loop();
-                }
+            BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
+            if (Integer.parseInt(bufferedReader.readLine()) > version) {
+                final String uri = bufferedReader.readLine();
+                StringBuilder stringBuilder = new StringBuilder();
+                String temp;
+                while ((temp = bufferedReader.readLine()) != null)
+                    stringBuilder.append(temp).append('\n');
+                Looper.prepare();
+                new AlertDialog.Builder(this).setPositiveButton(R.string.ok, (dialog, which) -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
+                Looper.loop();
             }
         } catch (Exception ignored) {
         }

@@ -18,12 +18,20 @@
             android:icon="@mipmap/ico_ai"
             android:title="@string/menu_ai" />
     </group>
-    <item android:title="@string/about">
+    <item android:title="@string/menu_about">
         <menu>
+            <item
+                android:id="@+id/menu_info"
+                android:icon="@mipmap/ico_info"
+                android:title="@string/menu_info" />
             <item
                 android:id="@+id/menu_github"
                 android:icon="@mipmap/ico_github"
                 android:title="@string/menu_github" />
+            <item
+                android:id="@+id/menu_exit"
+                android:icon="@mipmap/ico_exit"
+                android:title="@string/menu_exit" />
         </menu>
     </item>
 </menu>
