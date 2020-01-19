@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_home"
+            android:icon="@mipmap/ico_home"
+            android:title="@string/menu_home" />
+        <item
+            android:id="@+id/menu_web"
+            android:icon="@mipmap/ico_web"
+            android:title="@string/menu_web" />
+        <item
+            android:id="@+id/menu_remote"
+            android:icon="@mipmap/ico_remote"
+            android:title="@string/menu_remote" />
+        <item
+            android:id="@+id/menu_ai"
+            android:icon="@mipmap/ico_ai"
+            android:title="@string/menu_ai" />
+        <item
+            android:id="@+id/menu_translate"
+            android:icon="@mipmap/ico_translate"
+            android:title="@string/menu_translate" />
+    </group>
+    <item android:title="@string/menu_about">
+        <menu>
+            <item
+                android:id="@+id/menu_info"
+                android:icon="@mipmap/ico_info"
+                android:title="@string/menu_info" />
+            <item
+                android:id="@+id/menu_github"
+                android:icon="@mipmap/ico_github"
+                android:title="@string/menu_github" />
+            <item
+                android:id="@+id/menu_exit"
+                android:icon="@mipmap/ico_exit"
+                android:title="@string/menu_exit" />
+        </menu>
+    </item>
+</menu>
