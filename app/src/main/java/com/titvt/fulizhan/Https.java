@@ -16,8 +16,7 @@ class Https {
     String get() {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
-            httpURLConnection.setConnectTimeout(1000);
-            httpURLConnection.setReadTimeout(1000);
+            httpURLConnection.setConnectTimeout(2000);
             httpURLConnection.connect();
             if (httpURLConnection.getResponseCode() == 200) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
@@ -37,8 +36,7 @@ class Https {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
             httpURLConnection.setRequestMethod("POST");
-            httpURLConnection.setConnectTimeout(1000);
-            httpURLConnection.setReadTimeout(1000);
+            httpURLConnection.setConnectTimeout(2000);
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
             DataOutputStream dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());

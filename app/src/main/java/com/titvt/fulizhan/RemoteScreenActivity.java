@@ -27,7 +27,7 @@ import java.net.Socket;
 public class RemoteScreenActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView iv;
     Socket socket;
-    String host = "localhost";
+    String host;
     RemoteScreenHandler remoteScreenHandler;
     GestureDetector gestureDetector;
     ScaleGestureDetector scaleGestureDetector;
@@ -43,11 +43,9 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remote_screen);
-        iv = findViewById(R.id.iv);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        Bundle bundle = getIntent().getBundleExtra("bundle");
-        if (bundle != null)
-            host = bundle.getString("host");
+        iv = findViewById(R.id.iv);
+        host = getIntent().getStringExtra("host");
         Point point = new Point();
         getWindowManager().getDefaultDisplay().getSize(point);
         screenWidth = point.x;
@@ -171,9 +169,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             scaleFactor *= detector.getScaleFactor();
-            Point point = new Point();
-            getWindowManager().getDefaultDisplay().getSize(point);
-            iv.setLayoutParams(new FrameLayout.LayoutParams((int) (point.x * scaleFactor), (int) (point.y * scaleFactor)));
+            iv.setLayoutParams(new FrameLayout.LayoutParams((int) (screenWidth * scaleFactor), (int) (screenHeight * scaleFactor)));
             return true;
         }
 

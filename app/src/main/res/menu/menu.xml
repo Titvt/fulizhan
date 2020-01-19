@@ -17,6 +17,10 @@
             android:id="@+id/menu_ai"
             android:icon="@mipmap/ico_ai"
             android:title="@string/menu_ai" />
+        <item
+            android:id="@+id/menu_translate"
+            android:icon="@mipmap/ico_translate"
+            android:title="@string/menu_translate" />
     </group>
     <item android:title="@string/menu_about">
         <menu>

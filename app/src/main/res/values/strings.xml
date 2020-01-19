@@ -6,10 +6,15 @@
     <string name="send">发送</string>
     <string name="tips">从屏幕左侧向右滑动打开菜单栏</string>
     <string name="select">请选择局域网主机：</string>
+    <string name="trans_switch">开启截屏翻译</string>
+    <string name="trans_select">选择翻译语言：</string>
+    <string name="trans_en">英语</string>
+    <string name="trans_jp">日语</string>
     <string name="menu_home">首页</string>
     <string name="menu_web">日语百词斩</string>
     <string name="menu_remote">局域网远控</string>
     <string name="menu_ai">AI</string>
+    <string name="menu_translate">截屏翻译</string>
     <string name="menu_about">关于</string>
     <string name="menu_info">Information</string>
     <string name="menu_github">Github</string>

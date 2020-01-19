@@ -1,9 +1,11 @@
 package com.titvt.fulizhan;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
             web_view = new WebViewActivity(),
             remote_list = new RemoteListActivity(),
             ai = new AIActivity(),
+            translate = new TranslateActivity(),
             current;
     DrawerLayout drawerLayout;
 
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).add(R.id.fragment, ai).hide(ai).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).add(R.id.fragment, ai).hide(ai).add(R.id.fragment, translate).hide(translate).commit();
         current = home;
         drawerLayout = findViewById(R.id.drawerlayout);
         NavigationView navigation = findViewById(R.id.navigation);
@@ -58,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.menu_ai:
                     getSupportFragmentManager().beginTransaction().hide(current).show(ai).commit();
                     current = ai;
+                    break;
+                case R.id.menu_translate:
+                    getSupportFragmentManager().beginTransaction().hide(current).show(translate).commit();
+                    current = translate;
                     break;
                 case R.id.menu_info:
                     new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.14").show();

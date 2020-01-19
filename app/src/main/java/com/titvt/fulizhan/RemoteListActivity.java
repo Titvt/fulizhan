@@ -44,8 +44,13 @@ public class RemoteListActivity extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         remoteListAdapter = new RemoteListAdapter();
         rv.setAdapter(remoteListAdapter);
-        for (int i = 0; i < 256; i++)
-            new RemoteListThread("192.168." + i + ".").start();
+        new Thread() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 256; i++)
+                    new RemoteListThread("192.168." + i + ".").start();
+            }
+        }.start();
         return view;
     }
 
@@ -96,11 +101,7 @@ public class RemoteListActivity extends Fragment {
                 host = itemView.findViewById(R.id.host);
                 thumb = itemView.findViewById(R.id.thumb);
                 itemView.setOnClickListener(v -> {
-                    Intent intent = new Intent(getContext(), RemoteScreenActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("host", host.getText().toString());
-                    intent.putExtra("bundle", bundle);
-                    startActivity(intent);
+                    startActivity(new Intent(getContext(), RemoteScreenActivity.class).putExtra("host", host.getText().toString()));
                 });
             }
         }
@@ -127,29 +128,45 @@ public class RemoteListActivity extends Fragment {
 
         @Override
         public void run() {
-            for (int i = 0; i < 256; i++) {
-                try {
-                    Socket socket = new Socket();
-                    socket.connect(new InetSocketAddress(prefix + i, 9981), 50);
-                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    dataOutputStream.writeInt(0);
-                    dataOutputStream.flush();
-                    DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-                    String hostName = dataInputStream.readUTF();
-                    int size = dataInputStream.readInt(), num;
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(size);
-                    byte[] bytes = new byte[2048];
-                    do {
-                        if (size < 2048)
-                            num = dataInputStream.read(bytes, 0, size);
-                        else
-                            num = dataInputStream.read(bytes);
-                        byteArrayOutputStream.write(bytes, 0, num);
-                        size -= num;
-                    } while (size != 0);
-                    remoteListAdapter.addHost(new Hosts(hostName, prefix + i, byteArrayOutputStream.toByteArray()));
-                } catch (Exception ignored) {
-                }
+            for (int i = 0; i < 256; i += 32) {
+                new Thread() {
+                    String prefix;
+                    int offset;
+
+                    Thread init(String prefix, int offset) {
+                        this.prefix = prefix;
+                        this.offset = offset;
+                        return this;
+                    }
+
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 32; i++) {
+                            try {
+                                Socket socket = new Socket();
+                                socket.connect(new InetSocketAddress(prefix + (offset + i), 9981), 1000);
+                                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                                dataOutputStream.writeInt(0);
+                                dataOutputStream.flush();
+                                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                                String hostName = dataInputStream.readUTF();
+                                int size = dataInputStream.readInt(), num;
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(size);
+                                byte[] bytes = new byte[2048];
+                                do {
+                                    if (size < 2048)
+                                        num = dataInputStream.read(bytes, 0, size);
+                                    else
+                                        num = dataInputStream.read(bytes);
+                                    byteArrayOutputStream.write(bytes, 0, num);
+                                    size -= num;
+                                } while (size != 0);
+                                remoteListAdapter.addHost(new Hosts(hostName, prefix + (offset + i), byteArrayOutputStream.toByteArray()));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
+                }.init(prefix, i).start();
             }
         }
     }
