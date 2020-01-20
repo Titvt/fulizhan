@@ -18,9 +18,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.view.Gravity;
@@ -30,7 +28,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -77,7 +74,7 @@ public class TranslateService extends Service {
         layoutParams.x = 0;
         layoutParams.y = 0;
         layoutParams.format = PixelFormat.RGBA_8888;
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         iv = new ImageView(getApplicationContext());
         iv.setImageResource(R.mipmap.ic_launcher_round);
         iv.setOnTouchListener((v, event) -> {
@@ -148,8 +145,8 @@ public class TranslateService extends Service {
         return bitmap;
     }
 
-    void screenShotCallback(ArrayList<TranslateActivity.TranslateRecord> translateRecords) {
-        for (TranslateActivity.TranslateRecord translateRecord : translateRecords) {
+    void screenShotCallback(ArrayList<TranslateRecord> translateRecords) {
+        for (TranslateRecord translateRecord : translateRecords) {
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -158,9 +155,9 @@ public class TranslateService extends Service {
             layoutParams.width = translateRecord.width + 20;
             layoutParams.height = translateRecord.height + 20;
             layoutParams.x = translateRecord.x + (translateRecord.width - screenWidth) / 2;
-            layoutParams.y = translateRecord.y - screenHeight / 2;
+            layoutParams.y = translateRecord.y + (translateRecord.height - screenHeight) / 2;
             layoutParams.format = PixelFormat.RGBA_8888;
-            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
             TextView textView = new TextView(getApplicationContext());
             textView.setText(translateRecord.target_text);
             textView.setGravity(Gravity.CENTER);
@@ -171,48 +168,12 @@ public class TranslateService extends Service {
             textView.setTextColor(getApplicationContext().getResources().getColor(R.color.blue));
             textView.setBackground(getApplicationContext().getDrawable(R.color.white));
             Message message = new Message();
-            message.obj = new TranslateObject(textView, layoutParams);
+            message.obj = new TranslateView(textView, layoutParams);
             translateHandler.sendMessage(message);
             views.add(textView);
         }
         Message message = new Message();
-        message.obj = new TranslateObject(iv, layoutParams);
+        message.obj = new TranslateView(iv, layoutParams);
         translateHandler.sendMessage(message);
-    }
-
-    static class TranslateHandler extends Handler {
-        WindowManager windowManager;
-
-        TranslateHandler(WindowManager windowManager) {
-            this.windowManager = windowManager;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            windowManager.addView(((TranslateObject) msg.obj).view, ((TranslateObject) msg.obj).layoutParams);
-        }
-    }
-
-    class TranslateBinder extends Binder {
-        TranslateService service;
-        TranslateActivity activity;
-
-        TranslateBinder(TranslateService service) {
-            this.service = service;
-        }
-
-        void setActivity(TranslateActivity activity) {
-            this.activity = activity;
-        }
-    }
-
-    class TranslateObject {
-        View view;
-        WindowManager.LayoutParams layoutParams;
-
-        TranslateObject(View view, WindowManager.LayoutParams layoutParams) {
-            this.view = view;
-            this.layoutParams = layoutParams;
-        }
     }
 }

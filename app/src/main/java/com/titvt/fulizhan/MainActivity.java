@@ -1,11 +1,9 @@
 package com.titvt.fulizhan;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,13 +22,13 @@ import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity {
     private static final int version = 2;
+    DrawerLayout drawerLayout;
     Fragment home = new HomeActivity(),
             web_view = new WebViewActivity(),
             remote_list = new RemoteListActivity(),
             ai = new AIActivity(),
             translate = new TranslateActivity(),
             current;
-    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
+        drawerLayout = findViewById(R.id.drawerlayout);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).add(R.id.fragment, ai).hide(ai).add(R.id.fragment, translate).hide(translate).commit();
         current = home;
-        drawerLayout = findViewById(R.id.drawerlayout);
         NavigationView navigation = findViewById(R.id.navigation);
         navigation.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -97,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         else
             drawerLayout.openDrawer(GravityCompat.START);
-
         return true;
     }
 

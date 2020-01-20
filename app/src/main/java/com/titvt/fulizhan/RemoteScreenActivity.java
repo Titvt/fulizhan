@@ -1,9 +1,7 @@
 package com.titvt.fulizhan;
 
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -16,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -50,10 +47,102 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
         getWindowManager().getDefaultDisplay().getSize(point);
         screenWidth = point.x;
         screenHeight = point.y;
-        gestureDetector = new GestureDetector(this, new OnGestureListener());
-        scaleGestureDetector = new ScaleGestureDetector(this, new OnScaleGestureListener());
         remoteScreenHandler = new RemoteScreenHandler(iv);
-        new SocketThread().start();
+        gestureDetector = new GestureDetector(this, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                int x = (int) (targetWidth / 2 - (screenWidth / 2.0 - (e.getX() - iv.getX()) / scaleFactor) / screenHeight * targetHeight),
+                        y = (int) ((e.getY() - iv.getY()) / scaleFactor / screenHeight * targetHeight);
+                if (x < 0 || x >= targetWidth || y < 0 || y >= targetHeight)
+                    return true;
+                new RemoteScreenSocketSender(socket, 0, new Point(x, y)).start();
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                iv.setX(iv.getX() - distanceX);
+                iv.setY(iv.getY() - distanceY);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                int x = (int) (targetWidth / 2 - (screenWidth / 2.0 - (e.getX() - iv.getX()) / scaleFactor) / screenHeight * targetHeight),
+                        y = (int) ((e.getY() - iv.getY()) / scaleFactor / screenHeight * targetHeight);
+                if (x < 0 || x >= targetWidth || y < 0 || y >= targetHeight)
+                    return;
+                new RemoteScreenSocketSender(socket, 1, new Point(x, y)).start();
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return true;
+            }
+        });
+        scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.OnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                scaleFactor *= detector.getScaleFactor();
+                iv.setLayoutParams(new FrameLayout.LayoutParams((int) (screenWidth * scaleFactor), (int) (screenHeight * scaleFactor)));
+                return true;
+            }
+
+            @Override
+            public boolean onScaleBegin(ScaleGestureDetector detector) {
+                return true;
+            }
+
+            @Override
+            public void onScaleEnd(ScaleGestureDetector detector) {
+
+            }
+        });
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket(host, 9981);
+                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    dataOutputStream.writeInt(1);
+                    dataOutputStream.flush();
+                    DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                    int size, num;
+                    ByteArrayOutputStream byteArrayOutputStream;
+                    byte[] bytes = new byte[2048];
+                    Message message;
+                    targetWidth = dataInputStream.readInt();
+                    targetHeight = dataInputStream.readInt();
+                    while (!socket.isClosed()) {
+                        while ((size = dataInputStream.readInt()) == 0)
+                            sleep(1);
+                        byteArrayOutputStream = new ByteArrayOutputStream(size);
+                        do {
+                            if (size < 2048)
+                                num = dataInputStream.read(bytes, 0, size);
+                            else
+                                num = dataInputStream.read(bytes);
+                            byteArrayOutputStream.write(bytes, 0, num);
+                            size -= num;
+                        } while (size != 0);
+                        message = new Message();
+                        message.obj = byteArrayOutputStream.toByteArray();
+                        remoteScreenHandler.sendMessage(message);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }.start();
     }
 
     @Override
@@ -79,7 +168,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                 findViewById(R.id.keyboard_open).setVisibility(View.VISIBLE);
                 break;
             case R.id.keyboard_Shift:
-                new SocketSender(2, ((Button) view).getText().toString()).start();
+                new RemoteScreenSocketSender(socket, 2, ((Button) view).getText().toString()).start();
                 if (shift_on)
                     view.setBackground(getResources().getDrawable(R.drawable.keyboard));
                 else
@@ -87,7 +176,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                 shift_on = !shift_on;
                 break;
             case R.id.keyboard_Ctrl:
-                new SocketSender(2, ((Button) view).getText().toString()).start();
+                new RemoteScreenSocketSender(socket, 2, ((Button) view).getText().toString()).start();
                 if (ctrl_on)
                     view.setBackground(getResources().getDrawable(R.drawable.keyboard));
                 else
@@ -95,7 +184,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                 ctrl_on = !ctrl_on;
                 break;
             case R.id.keyboard_Win:
-                new SocketSender(2, ((Button) view).getText().toString()).start();
+                new RemoteScreenSocketSender(socket, 2, ((Button) view).getText().toString()).start();
                 if (win_on)
                     view.setBackground(getResources().getDrawable(R.drawable.keyboard));
                 else
@@ -103,7 +192,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                 win_on = !win_on;
                 break;
             case R.id.keyboard_Alt:
-                new SocketSender(2, ((Button) view).getText().toString()).start();
+                new RemoteScreenSocketSender(socket, 2, ((Button) view).getText().toString()).start();
                 if (alt_on)
                     view.setBackground(getResources().getDrawable(R.drawable.keyboard));
                 else
@@ -111,7 +200,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                 alt_on = !alt_on;
                 break;
             default:
-                new SocketSender(2, ((Button) view).getText().toString()).start();
+                new RemoteScreenSocketSender(socket, 2, ((Button) view).getText().toString()).start();
         }
     }
 
@@ -120,155 +209,5 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
         gestureDetector.onTouchEvent(event);
         scaleGestureDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
-    }
-
-    class OnGestureListener implements GestureDetector.OnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent e) {
-
-        }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            int x = (int) (targetWidth / 2 - (screenWidth / 2.0 - (e.getX() - iv.getX()) / scaleFactor) / screenHeight * targetHeight),
-                    y = (int) ((e.getY() - iv.getY()) / scaleFactor / screenHeight * targetHeight);
-            if (x < 0 || x >= targetWidth || y < 0 || y >= targetHeight)
-                return true;
-            new SocketSender(0, new Point(x, y)).start();
-            return true;
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            iv.setX(iv.getX() - distanceX);
-            iv.setY(iv.getY() - distanceY);
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-            int x = (int) (targetWidth / 2 - (screenWidth / 2.0 - (e.getX() - iv.getX()) / scaleFactor) / screenHeight * targetHeight),
-                    y = (int) ((e.getY() - iv.getY()) / scaleFactor / screenHeight * targetHeight);
-            if (x < 0 || x >= targetWidth || y < 0 || y >= targetHeight)
-                return;
-            new SocketSender(1, new Point(x, y)).start();
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return true;
-        }
-    }
-
-    class OnScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            scaleFactor *= detector.getScaleFactor();
-            iv.setLayoutParams(new FrameLayout.LayoutParams((int) (screenWidth * scaleFactor), (int) (screenHeight * scaleFactor)));
-            return true;
-        }
-
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector) {
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
-
-        }
-    }
-
-    static class RemoteScreenHandler extends Handler {
-        ImageView iv;
-
-        RemoteScreenHandler(ImageView iv) {
-            this.iv = iv;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            iv.setImageBitmap(BitmapFactory.decodeByteArray((byte[]) msg.obj, 0, ((byte[]) msg.obj).length));
-        }
-    }
-
-    class SocketThread extends Thread {
-        @Override
-        public void run() {
-            try {
-                socket = new Socket(host, 9981);
-                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                dataOutputStream.writeInt(1);
-                dataOutputStream.flush();
-                new SocketReceiver().start();
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    class SocketSender extends Thread {
-        int code;
-        Object object;
-
-        SocketSender(int code, Object object) {
-            this.code = code;
-            this.object = object;
-        }
-
-        @Override
-        public void run() {
-            try {
-                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                dataOutputStream.write(code);
-                switch (code) {
-                    case 0:
-                    case 1:
-                        dataOutputStream.writeInt(((Point) object).x);
-                        dataOutputStream.writeInt(((Point) object).y);
-                        break;
-                    case 2:
-                        dataOutputStream.writeUTF((String) object);
-                }
-                dataOutputStream.flush();
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    class SocketReceiver extends Thread {
-        @Override
-        public void run() {
-            try {
-                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-                int size, num;
-                ByteArrayOutputStream byteArrayOutputStream;
-                byte[] bytes = new byte[2048];
-                Message message;
-                targetWidth = dataInputStream.readInt();
-                targetHeight = dataInputStream.readInt();
-                while (!socket.isClosed()) {
-                    while ((size = dataInputStream.readInt()) == 0)
-                        sleep(1);
-                    byteArrayOutputStream = new ByteArrayOutputStream(size);
-                    do {
-                        if (size < 2048)
-                            num = dataInputStream.read(bytes, 0, size);
-                        else
-                            num = dataInputStream.read(bytes);
-                        byteArrayOutputStream.write(bytes, 0, num);
-                        size -= num;
-                    } while (size != 0);
-                    message = new Message();
-                    message.obj = byteArrayOutputStream.toByteArray();
-                    remoteScreenHandler.sendMessage(message);
-                }
-            } catch (Exception ignored) {
-            }
-        }
     }
 }

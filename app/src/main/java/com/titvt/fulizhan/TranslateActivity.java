@@ -33,7 +33,7 @@ import java.util.Objects;
 
 public class TranslateActivity extends Fragment implements ServiceConnection {
     private String language = "en";
-    private TranslateService.TranslateBinder binder;
+    private TranslateBinder binder;
 
     @Nullable
     @Override
@@ -65,7 +65,7 @@ public class TranslateActivity extends Fragment implements ServiceConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        binder = (TranslateService.TranslateBinder) service;
+        binder = (TranslateBinder) service;
         binder.setActivity(this);
     }
 
@@ -155,19 +155,6 @@ public class TranslateActivity extends Fragment implements ServiceConnection {
                     Objects.requireNonNull(getActivity()).stopService(new Intent(getActivity(), TranslateService.class));
                     getActivity().unbindService(this);
                 }
-        }
-    }
-
-    class TranslateRecord {
-        String target_text;
-        int x, y, width, height;
-
-        TranslateRecord(String target_text, int x, int y, int width, int height) {
-            this.target_text = target_text;
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
         }
     }
 }
