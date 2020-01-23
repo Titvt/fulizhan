@@ -19,7 +19,7 @@ import java.io.DataOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class RemoteListActivity extends Fragment {
+public class RemoteListFragment extends Fragment {
     private RemoteListAdapter remoteListAdapter;
 
     @Nullable

@@ -23,11 +23,11 @@ import java.io.StringReader;
 public class MainActivity extends AppCompatActivity {
     private static final int version = 2;
     DrawerLayout drawerLayout;
-    Fragment home = new HomeActivity(),
-            web_view = new WebViewActivity(),
-            remote_list = new RemoteListActivity(),
-            ai = new AIActivity(),
-            translate = new TranslateActivity(),
+    Fragment home,
+            web_view = null,
+            remote_list = null,
+            ai = null,
+            translate = null,
             current;
 
     @Override
@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         drawerLayout = findViewById(R.id.drawerlayout);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).add(R.id.fragment, web_view).hide(web_view).add(R.id.fragment, remote_list).hide(remote_list).add(R.id.fragment, ai).hide(ai).add(R.id.fragment, translate).hide(translate).commit();
+        home = new HomeFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
         current = home;
         NavigationView navigation = findViewById(R.id.navigation);
         navigation.setNavigationItemSelectedListener(item -> {
@@ -49,19 +50,35 @@ public class MainActivity extends AppCompatActivity {
                     current = home;
                     break;
                 case R.id.menu_web:
-                    getSupportFragmentManager().beginTransaction().hide(current).show(web_view).commit();
+                    if (web_view == null) {
+                        web_view = new WebViewFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, web_view).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(web_view).commit();
                     current = web_view;
                     break;
                 case R.id.menu_remote:
-                    getSupportFragmentManager().beginTransaction().hide(current).show(remote_list).commit();
+                    if (remote_list == null) {
+                        remote_list = new RemoteListFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, remote_list).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(remote_list).commit();
                     current = remote_list;
                     break;
                 case R.id.menu_ai:
-                    getSupportFragmentManager().beginTransaction().hide(current).show(ai).commit();
+                    if (ai == null) {
+                        ai = new AIFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, ai).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(ai).commit();
                     current = ai;
                     break;
                 case R.id.menu_translate:
-                    getSupportFragmentManager().beginTransaction().hide(current).show(translate).commit();
+                    if (translate == null) {
+                        translate = new TranslateFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, translate).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(translate).commit();
                     current = translate;
                     break;
                 case R.id.menu_info:

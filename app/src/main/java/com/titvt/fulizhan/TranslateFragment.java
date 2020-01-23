@@ -31,7 +31,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class TranslateActivity extends Fragment implements ServiceConnection {
+public class TranslateFragment extends Fragment implements ServiceConnection {
     private String language = "en";
     private TranslateBinder binder;
 

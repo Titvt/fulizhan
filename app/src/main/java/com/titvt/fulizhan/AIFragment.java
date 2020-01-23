@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.net.URLEncoder;
 
-public class AIActivity extends Fragment {
+public class AIFragment extends Fragment {
     private AIAdapter aiAdapter;
     private AIHandler aiHandler;
 

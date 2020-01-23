@@ -4,13 +4,13 @@ import android.os.Binder;
 
 class TranslateBinder extends Binder {
     TranslateService service;
-    TranslateActivity activity;
+    TranslateFragment activity;
 
     TranslateBinder(TranslateService service) {
         this.service = service;
     }
 
-    void setActivity(TranslateActivity activity) {
+    void setActivity(TranslateFragment activity) {
         this.activity = activity;
     }
 }
