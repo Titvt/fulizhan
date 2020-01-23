@@ -22,7 +22,7 @@ public class AIFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_ai, container, false);
+        View view = inflater.inflate(R.layout.fragment_ai, container, false);
         view.findViewById(R.id.btn_send).setOnClickListener(v -> {
             String string = ((EditText) view.findViewById(R.id.et)).getText().toString();
             aiAdapter.addMessage(string, true);

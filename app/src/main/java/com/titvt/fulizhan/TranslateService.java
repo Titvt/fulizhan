@@ -23,8 +23,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,10 +42,9 @@ public class TranslateService extends Service {
     WindowManager windowManager;
     WindowManager.LayoutParams layoutParams;
     ImageView iv;
+    FrameLayout frameLayout;
     float x, y;
     int screenWidth, screenHeight;
-    boolean translated = false;
-    ArrayList<View> views = new ArrayList<>();
 
     public TranslateService() {
     }
@@ -65,10 +65,16 @@ public class TranslateService extends Service {
         screenWidth = point.x;
         screenHeight = point.y;
         layoutParams = new WindowManager.LayoutParams();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        else
-            layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        layoutParams.type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
+        layoutParams.width = screenWidth;
+        layoutParams.height = screenHeight;
+        layoutParams.x = 0;
+        layoutParams.y = 0;
+        layoutParams.format = PixelFormat.RGBA_8888;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        translateHandler = new TranslateHandler(windowManager, layoutParams);
+        layoutParams = new WindowManager.LayoutParams();
+        layoutParams.type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
         layoutParams.width = 128;
         layoutParams.height = 128;
         layoutParams.x = 0;
@@ -93,35 +99,18 @@ public class TranslateService extends Service {
             return false;
         });
         iv.setOnClickListener(v -> {
-            if (translated) {
-                while (views.size() > 0) {
-                    windowManager.removeView(views.get(views.size() - 1));
-                    views.remove(views.size() - 1);
-                }
-                translated = false;
-            } else {
-                windowManager.removeView(iv);
-                binder.activity.screenShot();
-                translated = true;
-            }
+            windowManager.removeView(iv);
+            binder.activity.screenShot();
         });
         windowManager.addView(iv, layoutParams);
-        translateHandler = new TranslateHandler(windowManager);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         windowManager.removeView(iv);
-        while (views.size() > 0) {
-            windowManager.removeView(views.get(views.size() - 1));
-            views.remove(views.size() - 1);
-        }
-        translated = false;
-        if (virtualDisplay != null) {
+        if (virtualDisplay != null)
             virtualDisplay.release();
-            virtualDisplay = null;
-        }
         stopSelf();
     }
 
@@ -146,34 +135,38 @@ public class TranslateService extends Service {
     }
 
     void screenShotCallback(ArrayList<TranslateRecord> translateRecords) {
+        frameLayout = new FrameLayout(getApplicationContext());
         for (TranslateRecord translateRecord : translateRecords) {
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            else
-                layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-            layoutParams.width = translateRecord.width + 20;
-            layoutParams.height = translateRecord.height + 20;
-            layoutParams.x = translateRecord.x + (translateRecord.width - screenWidth) / 2;
-            layoutParams.y = translateRecord.y + (translateRecord.height - screenHeight) / 2;
-            layoutParams.format = PixelFormat.RGBA_8888;
-            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+            if (translateRecord.y < 30)
+                continue;
             TextView textView = new TextView(getApplicationContext());
+            textView.setLayoutParams(new FrameLayout.LayoutParams(translateRecord.width, translateRecord.height));
+            textView.setX(translateRecord.x);
+            textView.setY(translateRecord.y - 30);
             textView.setText(translateRecord.target_text);
             textView.setGravity(Gravity.CENTER);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 textView.setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-            }
             textView.setMaxLines(1);
-            textView.setTextColor(getApplicationContext().getResources().getColor(R.color.blue));
-            textView.setBackground(getApplicationContext().getDrawable(R.color.white));
-            Message message = new Message();
-            message.obj = new TranslateView(textView, layoutParams);
-            translateHandler.sendMessage(message);
-            views.add(textView);
+            textView.setTextColor(getResources().getColor(R.color.blue));
+            textView.setBackground(getDrawable(R.color.white));
+            frameLayout.addView(textView);
         }
+        Button button = new Button(getApplicationContext());
+        button.setLayoutParams(new FrameLayout.LayoutParams(240, 120));
+        button.setX(screenWidth / 2 - 120);
+        button.setY(screenHeight - 150);
+        button.setText("关闭");
+        button.setTextSize(18);
+        button.setTextColor(getResources().getColor(R.color.white));
+        button.setBackground(getDrawable(R.drawable.close_button));
+        button.setOnClickListener(v -> {
+            windowManager.removeView(frameLayout);
+            windowManager.addView(iv, layoutParams);
+        });
+        frameLayout.addView(button);
         Message message = new Message();
-        message.obj = new TranslateView(iv, layoutParams);
+        message.obj = frameLayout;
         translateHandler.sendMessage(message);
     }
 }

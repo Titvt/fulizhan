@@ -38,7 +38,7 @@ public class TranslateFragment extends Fragment implements ServiceConnection {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_translate, container, false);
+        View view = inflater.inflate(R.layout.fragment_translate, container, false);
         view.findViewById(R.id.trans_switch).setOnClickListener(v -> {
             if (((Switch) v).isChecked())
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

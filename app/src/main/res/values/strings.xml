@@ -15,6 +15,7 @@
     <string name="menu_remote">局域网远控</string>
     <string name="menu_ai">AI</string>
     <string name="menu_translate">截屏翻译</string>
+    <string name="menu_ncov">nCoV实时情报</string>
     <string name="menu_about">关于</string>
     <string name="menu_info">Information</string>
     <string name="menu_github">Github</string>

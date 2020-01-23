@@ -21,14 +21,9 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int version = 2;
+    private static final int version = 3;
     DrawerLayout drawerLayout;
-    Fragment home,
-            web_view = null,
-            remote_list = null,
-            ai = null,
-            translate = null,
-            current;
+    Fragment home, web_view, remote_list, ai, translate, ncov, current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +75,14 @@ public class MainActivity extends AppCompatActivity {
                     } else
                         getSupportFragmentManager().beginTransaction().hide(current).show(translate).commit();
                     current = translate;
+                    break;
+                case R.id.menu_ncov:
+                    if (ncov == null) {
+                        ncov = new NCOVFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, ncov).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(ncov).commit();
+                    current = ncov;
                     break;
                 case R.id.menu_info:
                     new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.14").show();
