@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.AI;
 
 import android.os.Handler;
 import android.os.Message;

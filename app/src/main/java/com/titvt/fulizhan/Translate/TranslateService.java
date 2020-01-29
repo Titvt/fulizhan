@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Translate;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -31,20 +31,22 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.titvt.fulizhan.R;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class TranslateService extends Service {
-    TranslateBinder binder = new TranslateBinder(this);
-    TranslateHandler translateHandler;
-    ImageReader imageReader;
-    VirtualDisplay virtualDisplay;
-    WindowManager windowManager;
-    WindowManager.LayoutParams layoutParams;
-    ImageView iv;
-    FrameLayout frameLayout;
-    float x, y;
-    int screenWidth, screenHeight;
+    private TranslateBinder binder = new TranslateBinder(this);
+    private TranslateHandler translateHandler;
+    private ImageReader imageReader;
+    private VirtualDisplay virtualDisplay;
+    private WindowManager windowManager;
+    private WindowManager.LayoutParams layoutParams;
+    private ImageView iv;
+    private FrameLayout frameLayout;
+    private float x, y;
+    private int screenWidth, screenHeight;
 
     public TranslateService() {
     }

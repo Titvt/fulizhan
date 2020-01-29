@@ -6,14 +6,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class Https {
+public class Https {
     private String uri;
 
-    Https(String uri) {
+    public Https(String uri) {
         this.uri = uri;
     }
 
-    String get() {
+    public String get() {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
             httpURLConnection.setConnectTimeout(2000);
@@ -32,7 +32,7 @@ class Https {
         return "";
     }
 
-    String post(String body) {
+    public String post(String body) {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
             httpURLConnection.setRequestMethod("POST");

@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.AI;
 
 import android.os.Bundle;
 import android.os.Message;
@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.titvt.fulizhan.Https;
+import com.titvt.fulizhan.R;
 
 import java.net.URLEncoder;
 

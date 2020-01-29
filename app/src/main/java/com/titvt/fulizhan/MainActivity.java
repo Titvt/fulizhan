@@ -16,14 +16,21 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
+import com.titvt.fulizhan.AI.AIFragment;
+import com.titvt.fulizhan.Home.HomeFragment;
+import com.titvt.fulizhan.NCOV.NCOVFragment;
+import com.titvt.fulizhan.Remote.RemoteListFragment;
+import com.titvt.fulizhan.Setting.SettingFragment;
+import com.titvt.fulizhan.Translate.TranslateFragment;
+import com.titvt.fulizhan.Web.WebFragment;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity {
     private static final int version = 3;
-    DrawerLayout drawerLayout;
-    Fragment home, web_view, remote_list, ai, translate, ncov, current;
+    private DrawerLayout drawerLayout;
+    private Fragment home, web, remote, ai, translate, ncov, setting, current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
         current = home;
         NavigationView navigation = findViewById(R.id.navigation);
+        navigation.setCheckedItem(R.id.menu_home);
         navigation.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_home:
@@ -45,20 +53,20 @@ public class MainActivity extends AppCompatActivity {
                     current = home;
                     break;
                 case R.id.menu_web:
-                    if (web_view == null) {
-                        web_view = new WebViewFragment();
-                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, web_view).commit();
+                    if (web == null) {
+                        web = new WebFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, web).commit();
                     } else
-                        getSupportFragmentManager().beginTransaction().hide(current).show(web_view).commit();
-                    current = web_view;
+                        getSupportFragmentManager().beginTransaction().hide(current).show(web).commit();
+                    current = web;
                     break;
                 case R.id.menu_remote:
-                    if (remote_list == null) {
-                        remote_list = new RemoteListFragment();
-                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, remote_list).commit();
+                    if (remote == null) {
+                        remote = new RemoteListFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, remote).commit();
                     } else
-                        getSupportFragmentManager().beginTransaction().hide(current).show(remote_list).commit();
-                    current = remote_list;
+                        getSupportFragmentManager().beginTransaction().hide(current).show(remote).commit();
+                    current = remote;
                     break;
                 case R.id.menu_ai:
                     if (ai == null) {
@@ -84,8 +92,16 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().hide(current).show(ncov).commit();
                     current = ncov;
                     break;
-                case R.id.menu_info:
-                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.14").show();
+                case R.id.menu_setting:
+                    if (setting == null) {
+                        setting = new SettingFragment();
+                        getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, setting).commit();
+                    } else
+                        getSupportFragmentManager().beginTransaction().hide(current).show(setting).commit();
+                    current = setting;
+                    break;
+                case R.id.menu_about:
+                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.141").show();
                     break;
                 case R.id.menu_github:
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Titvt")));
@@ -118,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    void checkVersion() {
+    private void checkVersion() {
         try {
             BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
             if (Integer.parseInt(bufferedReader.readLine()) > version) {

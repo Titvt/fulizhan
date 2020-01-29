@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Translate;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -24,6 +24,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.titvt.fulizhan.R;
+import com.titvt.fulizhan.Https;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
@@ -80,7 +83,7 @@ public class TranslateFragment extends Fragment implements ServiceConnection {
             public void run() {
                 Bitmap bitmap = binder.service.screenShot();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 64, byteArrayOutputStream);
                 ArrayList<TranslateRecord> translateRecords = new ArrayList<>();
                 JsonReader jsonReader = new JsonReader(new StringReader(new Https("https://www.titvt.com/flz/translate.php").post("language=" + language + "&image=" + URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)))));
                 try {

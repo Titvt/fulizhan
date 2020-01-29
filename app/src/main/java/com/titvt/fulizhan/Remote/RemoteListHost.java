@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Remote;
 
 class RemoteListHost {
     String hostName;

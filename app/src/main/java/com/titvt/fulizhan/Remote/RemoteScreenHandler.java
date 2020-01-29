@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Remote;
 
 import android.graphics.BitmapFactory;
 import android.os.Handler;

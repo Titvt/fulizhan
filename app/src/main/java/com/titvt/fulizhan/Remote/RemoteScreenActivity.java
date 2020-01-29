@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Remote;
 
 import android.graphics.Point;
 import android.os.Bundle;
@@ -16,22 +16,24 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.titvt.fulizhan.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
 public class RemoteScreenActivity extends AppCompatActivity implements View.OnClickListener {
-    ImageView iv;
-    Socket socket;
-    String host;
-    RemoteScreenHandler remoteScreenHandler;
-    GestureDetector gestureDetector;
-    ScaleGestureDetector scaleGestureDetector;
-    float scaleFactor = 1.0f;
-    int screenWidth, screenHeight, targetWidth, targetHeight;
-    long deltaTime = 0;
-    boolean shift_on = false,
+    private ImageView iv;
+    private Socket socket;
+    private String host;
+    private RemoteScreenHandler remoteScreenHandler;
+    private GestureDetector gestureDetector;
+    private ScaleGestureDetector scaleGestureDetector;
+    private float scaleFactor = 1.0f;
+    private int screenWidth, screenHeight, targetWidth, targetHeight;
+    private long deltaTime = 0;
+    private boolean shift_on = false,
             ctrl_on = false,
             win_on = false,
             alt_on = false;

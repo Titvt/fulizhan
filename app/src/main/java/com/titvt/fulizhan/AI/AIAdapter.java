@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.AI;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.titvt.fulizhan.R;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.titvt.fulizhan;
+package com.titvt.fulizhan.Translate;
 
 import android.os.Handler;
 import android.os.Message;
