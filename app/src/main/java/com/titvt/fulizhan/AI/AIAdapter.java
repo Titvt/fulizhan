@@ -1,6 +1,8 @@
 package com.titvt.fulizhan.AI;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +31,10 @@ class AIAdapter extends RecyclerView.Adapter<AIAdapter.ViewHolder> {
     void addMessage(String message, boolean sended) {
         messages.add(message);
         this.sended.add(sended);
-        notifyItemInserted(getItemCount() - 1);
-        rv.scrollToPosition(getItemCount() - 1);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            notifyItemInserted(getItemCount() - 1);
+            rv.scrollToPosition(getItemCount() - 1);
+        });
     }
 
     @NonNull

@@ -63,6 +63,5 @@ public class ProgressButton extends AppCompatButton {
 
     public void setProgress(int progress) {
         this.progress = progress;
-        invalidate();
     }
 }

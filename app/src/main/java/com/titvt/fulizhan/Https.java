@@ -13,7 +13,7 @@ public class Https {
         this.uri = uri;
     }
 
-    public String get() {
+    String get() {
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri).openConnection();
             httpURLConnection.setConnectTimeout(2000);

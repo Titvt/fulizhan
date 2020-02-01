@@ -83,6 +83,7 @@ class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.ViewHolde
                                 } catch (Exception ignored) {
                                 }
                                 pb.setProgress(++pn);
+                                pb.postInvalidate();
                             }
                         }
                     }.init("192.168." + i + ".").start();

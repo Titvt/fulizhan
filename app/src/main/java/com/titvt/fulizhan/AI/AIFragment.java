@@ -1,7 +1,6 @@
 package com.titvt.fulizhan.AI;
 
 import android.os.Bundle;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import java.net.URLEncoder;
 
 public class AIFragment extends Fragment {
     private AIAdapter aiAdapter;
-    private AIHandler aiHandler;
 
     @Nullable
     @Override
@@ -30,33 +28,26 @@ public class AIFragment extends Fragment {
             String string = ((EditText) view.findViewById(R.id.et)).getText().toString();
             aiAdapter.addMessage(string, true);
             new Thread() {
-                private AIHandler aiHandler;
                 private String string;
 
-                Thread init(AIHandler aiHandler, String string) {
-                    this.aiHandler = aiHandler;
+                Thread init(String string) {
                     this.string = string;
                     return this;
                 }
 
                 @Override
                 public void run() {
-                    Message message = new Message();
                     String string = new Https("https://www.titvt.com/flz/ai.php").post("question=" + URLEncoder.encode(this.string));
-                    if (string.equals(""))
-                        message.obj = "emmm...";
-                    else
-                        message.obj = string;
-                    aiHandler.sendMessage(message);
+                    string = string.equals("") ? "emmm..." : string;
+                    aiAdapter.addMessage(string, false);
                 }
-            }.init(aiHandler, string).start();
+            }.init(string).start();
             ((EditText) view.findViewById(R.id.et)).setText("");
         });
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         aiAdapter = new AIAdapter(getContext(), rv);
         rv.setAdapter(aiAdapter);
-        aiHandler = new AIHandler(aiAdapter);
         return view;
     }
 }

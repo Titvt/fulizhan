@@ -1,10 +1,10 @@
 package com.titvt.fulizhan.Translate;
 
-class TranslateRecord {
+public class TranslateRecord {
     String target_text;
     int x, y, width, height;
 
-    TranslateRecord(String target_text, int x, int y, int width, int height) {
+    public TranslateRecord(String target_text, int x, int y, int width, int height) {
         this.target_text = target_text;
         this.x = x;
         this.y = y;

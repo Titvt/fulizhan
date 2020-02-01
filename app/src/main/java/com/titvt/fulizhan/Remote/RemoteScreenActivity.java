@@ -122,7 +122,6 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                     int size, num;
                     ByteArrayOutputStream byteArrayOutputStream;
                     byte[] bytes = new byte[2048];
-                    Message message;
                     targetWidth = dataInputStream.readInt();
                     targetHeight = dataInputStream.readInt();
                     while (!socket.isClosed()) {
@@ -137,8 +136,10 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
                             byteArrayOutputStream.write(bytes, 0, num);
                             size -= num;
                         } while (size != 0);
-                        message = new Message();
-                        message.obj = byteArrayOutputStream.toByteArray();
+                        Message message = new Message();
+                        Bundle bundle = new Bundle();
+                        bundle.putByteArray("data", byteArrayOutputStream.toByteArray());
+                        message.setData(bundle);
                         remoteScreenHandler.sendMessage(message);
                     }
                 } catch (Exception ignored) {

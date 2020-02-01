@@ -16,6 +16,7 @@ class RemoteScreenHandler extends Handler {
 
     @Override
     public void handleMessage(@NonNull Message msg) {
-        iv.setImageBitmap(BitmapFactory.decodeByteArray((byte[]) msg.obj, 0, ((byte[]) msg.obj).length));
+        byte[] data = msg.getData().getByteArray("data");
+        iv.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
     }
 }
