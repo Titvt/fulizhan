@@ -25,7 +25,7 @@ public class WebFragment extends Fragment {
         wv.setWebViewClient(new WebViewClient());
         wv.setLongClickable(true);
         wv.setOnLongClickListener(v -> true);
-        wv.loadUrl("https://www.titvt.com/flz/main.html");
+        wv.loadUrl("https://www.titvt.com/flz/web/main.html");
         return view;
     }
 }

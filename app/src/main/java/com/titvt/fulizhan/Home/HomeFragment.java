@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -23,7 +24,7 @@ public class HomeFragment extends Fragment {
         WebView wv = view.findViewById(R.id.wv);
         wv.getSettings().setJavaScriptEnabled(true);
         wv.setWebViewClient(new WebViewClient());
-        wv.loadUrl("https://3g.dxy.cn/newh5/view/pneumonia");
+        wv.loadUrl("https://www.titvt.com/flz/home.html");
         return view;
     }
 }

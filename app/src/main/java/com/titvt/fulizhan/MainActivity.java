@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Process;
 import android.provider.Settings;
 import android.util.Base64;
 import android.util.JsonReader;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
-    private static final int version = 3;
+    private static final int version = 4;
     public String language = "en";
     private DrawerLayout drawerLayout;
     private Fragment home, web, remote, ai, setting, current;
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                             } else
                                 startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
                         } else {
-                            Toast.makeText(this, "安卓版本太低，不支持悬浮窗", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "安卓版本过低，不支持悬浮窗", Toast.LENGTH_LONG).show();
                         }
                     } else {
                         stopService(new Intent(this, TranslateService.class));
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                     break;
                 case R.id.menu_about:
-                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.141").show();
+                    new AlertDialog.Builder(this).setPositiveButton(R.string.ok, null).setTitle("福利栈").setMessage("作者：古月浪子\nQQ：1044805408\n版本：3.1415").show();
                     break;
                 case R.id.menu_github:
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Titvt")));
@@ -135,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+        checkVersion();
         new Thread() {
             @Override
             public void run() {
-                checkVersion();
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (Exception ignored) {
                 }
                 drawerLayout.openDrawer(GravityCompat.START);
@@ -158,23 +159,28 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     private void checkVersion() {
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
-            if (Integer.parseInt(bufferedReader.readLine()) > version) {
-                final String uri = bufferedReader.readLine();
-                StringBuilder stringBuilder = new StringBuilder();
-                String temp;
-                while ((temp = bufferedReader.readLine()) != null)
-                    stringBuilder.append(temp).append('\n');
-                Looper.prepare();
-                new AlertDialog.Builder(this).setPositiveButton(R.string.ok, (dialog, which) -> {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
-                Looper.loop();
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
+                    if (Integer.parseInt(bufferedReader.readLine()) > version) {
+                        final String uri = bufferedReader.readLine();
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String temp;
+                        while ((temp = bufferedReader.readLine()) != null)
+                            stringBuilder.append(temp).append('\n');
+                        Looper.prepare();
+                        new AlertDialog.Builder(MainActivity.this).setPositiveButton(R.string.ok, (dialog, which) -> {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                            Process.killProcess(Process.myPid());
+                        }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
+                        Looper.loop();
+                    }
+                } catch (Exception ignored) {
+                }
             }
-        } catch (Exception ignored) {
-        }
+        }.start();
     }
 
     @Override
