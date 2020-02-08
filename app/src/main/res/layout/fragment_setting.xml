@@ -7,30 +7,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
         android:background="@drawable/keyboard">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="15dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/trans_language"
-            android:textColor="@color/blue"
-            android:textSize="20sp" />
+            style="@style/SettingText"
+            android:text="@string/trans_language" />
 
         <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:orientation="vertical">
 
             <RadioButton
                 android:id="@+id/trans_en"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_margin="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="5dp"
                 android:layout_weight="1"
                 android:checked="true"
                 android:text="@string/trans_en"
@@ -41,13 +38,35 @@
                 android:id="@+id/trans_jp"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_margin="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="15dp"
                 android:layout_weight="1"
                 android:text="@string/trans_jp"
                 android:textColor="@color/blue"
                 android:textSize="18sp" />
 
         </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/keyboard">
+
+        <TextView
+            style="@style/SettingText"
+            android:text="@string/web_select" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp" />
 
     </LinearLayout>
 

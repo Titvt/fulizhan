@@ -26,6 +26,8 @@ public class AIFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_ai, container, false);
         view.findViewById(R.id.btn_send).setOnClickListener(v -> {
             String string = ((EditText) view.findViewById(R.id.et)).getText().toString();
+            if (string.equals(""))
+                return;
             aiAdapter.addMessage(string, true);
             new Thread() {
                 private String string;

@@ -22,8 +22,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -48,8 +50,9 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
     private static final int version = 4;
     public String language = "en";
+    public Fragment home, web, remote, ai, setting, current;
     private DrawerLayout drawerLayout;
-    private Fragment home, web, remote, ai, setting, current;
+    private Toolbar toolbar;
     private NavigationView navigation;
     private boolean translate;
     private TranslateBinder binder;
@@ -63,18 +66,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         drawerLayout = findViewById(R.id.drawerlayout);
-        home = new HomeFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
-        current = home;
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.no_string);
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
+        drawerLayout.addDrawerListener(toggle);
+        toolbar.setTitle(R.string.menu_home);
+        toggle.syncState();
         navigation = findViewById(R.id.navigation);
         navigation.setCheckedItem(R.id.menu_home);
         navigation.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menu_home:
+                    toolbar.setTitle(R.string.menu_home);
                     getSupportFragmentManager().beginTransaction().hide(current).show(home).commit();
                     current = home;
                     break;
                 case R.id.menu_web:
+                    toolbar.setTitle(R.string.menu_web);
                     if (web == null) {
                         web = new WebFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, web).commit();
@@ -83,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     current = web;
                     break;
                 case R.id.menu_remote:
+                    toolbar.setTitle(R.string.menu_remote);
                     if (remote == null) {
                         remote = new RemoteListFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, remote).commit();
@@ -91,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     current = remote;
                     break;
                 case R.id.menu_ai:
+                    toolbar.setTitle(R.string.menu_ai);
                     if (ai == null) {
                         ai = new AIFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, ai).commit();
@@ -99,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     current = ai;
                     break;
                 case R.id.menu_setting:
+                    toolbar.setTitle(R.string.menu_setting);
                     if (setting == null) {
                         setting = new SettingFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, setting).commit();
@@ -136,25 +148,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+        home = new HomeFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
+        current = home;
         checkVersion();
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (Exception ignored) {
-                }
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        }.start();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START))
-            drawerLayout.closeDrawer(GravityCompat.START);
-        else
-            drawerLayout.openDrawer(GravityCompat.START);
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+            if (drawerLayout.isDrawerOpen(GravityCompat.START))
+                drawerLayout.closeDrawer(GravityCompat.START);
+            else if (current == home) {
+                if (((HomeFragment) home).wv.canGoBack())
+                    ((HomeFragment) home).wv.goBack();
+            } else if (current == web) {
+                if (((WebFragment) web).wv.canGoBack())
+                    ((WebFragment) web).wv.goBack();
+            }
         return true;
     }
 

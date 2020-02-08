@@ -10,7 +10,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="10dp"
-        android:contentDescription="@string/app_name"
+        android:contentDescription="@string/no_string"
         android:visibility="gone" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="10dp"
-        android:contentDescription="@string/app_name"
+        android:contentDescription="@string/no_string"
         android:visibility="gone" />
 
 </LinearLayout>

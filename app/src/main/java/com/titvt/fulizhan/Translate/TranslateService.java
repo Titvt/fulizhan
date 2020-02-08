@@ -144,7 +144,7 @@ public class TranslateService extends Service {
             textView.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 textView.setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-            textView.setMaxLines(1);
+            textView.setSingleLine();
             textView.setTextColor(getResources().getColor(R.color.blue));
             textView.setBackground(getDrawable(R.color.white));
             frameLayout.addView(textView);
