@@ -34,15 +34,4 @@
         app:progressBackgroundColor="@color/colorPrimary"
         app:progressColor="@color/blue" />
 
-    <Button
-        android:id="@+id/btn_get_exe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/button"
-        android:text="@string/remote_get"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
-
 </LinearLayout>

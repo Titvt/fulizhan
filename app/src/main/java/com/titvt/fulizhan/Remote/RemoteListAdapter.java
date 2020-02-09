@@ -67,6 +67,26 @@ class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.ViewHolde
                                     dataOutputStream.flush();
                                     DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                                     String hostName = dataInputStream.readUTF();
+                                    String hostType = "未知";
+                                    switch (dataInputStream.readInt()) {
+                                        case 1:
+                                            hostType = "普通模式";
+                                            break;
+                                        case 2:
+                                            hostType = "高清模式";
+                                            break;
+                                        case 3:
+                                            hostType = "高帧率模式";
+                                            break;
+                                        case 4:
+                                            hostType = "仅观看模式";
+                                            break;
+                                        case 5:
+                                            hostType = "高清仅观看模式";
+                                            break;
+                                        case 6:
+                                            hostType = "高帧率仅观看模式";
+                                    }
                                     int size = dataInputStream.readInt(), num;
                                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(size);
                                     byte[] bytes = new byte[2048];
@@ -78,7 +98,7 @@ class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.ViewHolde
                                         byteArrayOutputStream.write(bytes, 0, num);
                                         size -= num;
                                     } while (size != 0);
-                                    remoteListHosts.add(new RemoteListHost(hostName, prefix + i, byteArrayOutputStream.toByteArray()));
+                                    remoteListHosts.add(new RemoteListHost(hostName, hostType, prefix + i, byteArrayOutputStream.toByteArray()));
                                     new Handler(Looper.getMainLooper()).post(() -> notifyItemInserted(getItemCount() - 1));
                                 } catch (Exception ignored) {
                                 }
@@ -106,8 +126,9 @@ class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RemoteListAdapter.ViewHolder holder, int position) {
         holder.hostName.setText(remoteListHosts.get(position).hostName);
+        holder.hostType.setText(remoteListHosts.get(position).hostType);
         holder.host.setText(remoteListHosts.get(position).host);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(remoteListHosts.get(position).bytes, 0, remoteListHosts.get(position).bytes.length),
+        Bitmap bitmap = BitmapFactory.decodeByteArray(remoteListHosts.get(position).thumb, 0, remoteListHosts.get(position).thumb.length),
                 thumb = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(thumb);
         Paint paint = new Paint();
@@ -127,12 +148,13 @@ class RemoteListAdapter extends RecyclerView.Adapter<RemoteListAdapter.ViewHolde
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView hostName, host;
+        TextView hostName, hostType, host;
         ImageView thumb;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             hostName = itemView.findViewById(R.id.hostName);
+            hostType = itemView.findViewById(R.id.hostType);
             host = itemView.findViewById(R.id.host);
             thumb = itemView.findViewById(R.id.thumb);
             itemView.setOnClickListener(v -> context.startActivity(new Intent(context, RemoteScreenActivity.class).putExtra("host", host.getText().toString())));

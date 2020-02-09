@@ -4,13 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:background="@drawable/keyboard">
+    <LinearLayout style="@style/SettingGroup">
 
         <TextView
             style="@style/SettingText"
@@ -50,13 +44,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/keyboard">
+    <LinearLayout style="@style/SettingGroup">
 
         <TextView
             style="@style/SettingText"
@@ -67,6 +55,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="15dp" />
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/SettingGroup">
+
+        <TextView
+            android:id="@+id/remote_get"
+            style="@style/SettingText"
+            android:gravity="center"
+            android:text="@string/remote_get" />
 
     </LinearLayout>
 

@@ -4,13 +4,13 @@
     <string name="no_string" />
     <string name="ok">确定</string>
     <string name="remote_refresh">刷新</string>
-    <string name="remote_get">获取Windows端远控程序</string>
     <string name="remote_select">请选择局域网主机：</string>
     <string name="ai_send">发送</string>
     <string name="trans_language">选择翻译语言：</string>
     <string name="trans_en">英语</string>
     <string name="trans_jp">日语</string>
     <string name="web_select">日语百词斩候选答案数：</string>
+    <string name="remote_get">获取Windows端远控程序</string>
     <string name="menu_home">首页</string>
     <string name="menu_web">日语百词斩</string>
     <string name="menu_remote">局域网远控</string>

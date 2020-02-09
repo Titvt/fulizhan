@@ -2,12 +2,14 @@ package com.titvt.fulizhan.Remote;
 
 class RemoteListHost {
     String hostName;
+    String hostType;
     String host;
-    byte[] bytes;
+    byte[] thumb;
 
-    RemoteListHost(String hostName, String host, byte[] bytes) {
+    RemoteListHost(String hostName, String hostType, String host, byte[] thumb) {
         this.hostName = hostName;
+        this.hostType = hostType;
         this.host = host;
-        this.bytes = bytes;
+        this.thumb = thumb;
     }
 }
