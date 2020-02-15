@@ -18,10 +18,13 @@ import android.provider.Settings;
 import android.util.Base64;
 import android.util.JsonReader;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,7 +53,14 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
     private static final int version = 4;
     public String language = "en";
-    public Fragment home, web, remote, ai, setting, current;
+    public int quality, offset;
+    public HomeFragment home;
+    public WebFragment web;
+    public RemoteListFragment remote;
+    public AIFragment ai;
+    public SettingFragment setting;
+    public Fragment current;
+    private Menu menu;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigation;
@@ -67,11 +77,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         drawerLayout = findViewById(R.id.drawerlayout);
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.no_string);
+        toolbar.setTitle(R.string.menu_home);
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(toggle);
-        toolbar.setTitle(R.string.menu_home);
         toggle.syncState();
         navigation = findViewById(R.id.navigation);
         navigation.setCheckedItem(R.id.menu_home);
@@ -79,11 +88,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             switch (item.getItemId()) {
                 case R.id.menu_home:
                     toolbar.setTitle(R.string.menu_home);
+                    menu.clear();
+                    menu.add(R.string.menu_refresh);
                     getSupportFragmentManager().beginTransaction().hide(current).show(home).commit();
                     current = home;
                     break;
                 case R.id.menu_web:
                     toolbar.setTitle(R.string.menu_web);
+                    menu.clear();
+                    menu.add(R.string.menu_refresh);
                     if (web == null) {
                         web = new WebFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, web).commit();
@@ -93,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     break;
                 case R.id.menu_remote:
                     toolbar.setTitle(R.string.menu_remote);
+                    menu.clear();
                     if (remote == null) {
                         remote = new RemoteListFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, remote).commit();
@@ -102,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     break;
                 case R.id.menu_ai:
                     toolbar.setTitle(R.string.menu_ai);
+                    menu.clear();
+                    menu.add(R.string.menu_clear);
                     if (ai == null) {
                         ai = new AIFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, ai).commit();
@@ -111,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     break;
                 case R.id.menu_setting:
                     toolbar.setTitle(R.string.menu_setting);
+                    menu.clear();
                     if (setting == null) {
                         setting = new SettingFragment();
                         getSupportFragmentManager().beginTransaction().hide(current).add(R.id.fragment, setting).commit();
@@ -151,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         home = new HomeFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
         current = home;
+        quality = Integer.parseInt(getSharedPreferences("flz", Context.MODE_PRIVATE).getString("quality", "60"));
+        offset = Integer.parseInt(getSharedPreferences("flz", Context.MODE_PRIVATE).getString("offset", "0"));
         checkVersion();
     }
 
@@ -159,39 +178,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if (keyCode == KeyEvent.KEYCODE_BACK)
             if (drawerLayout.isDrawerOpen(GravityCompat.START))
                 drawerLayout.closeDrawer(GravityCompat.START);
-            else if (current == home) {
-                if (((HomeFragment) home).wv.canGoBack())
-                    ((HomeFragment) home).wv.goBack();
-            } else if (current == web) {
-                if (((WebFragment) web).wv.canGoBack())
-                    ((WebFragment) web).wv.goBack();
+            else if (current == home && home.wv.canGoBack()) {
+                home.wv.goBack();
+            } else if (current == web && web.wv.canGoBack()) {
+                web.wv.goBack();
             }
         return true;
     }
 
-    private void checkVersion() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
-                    if (Integer.parseInt(bufferedReader.readLine()) > version) {
-                        final String uri = bufferedReader.readLine();
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String temp;
-                        while ((temp = bufferedReader.readLine()) != null)
-                            stringBuilder.append(temp).append('\n');
-                        Looper.prepare();
-                        new AlertDialog.Builder(MainActivity.this).setPositiveButton(R.string.ok, (dialog, which) -> {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                            Process.killProcess(Process.myPid());
-                        }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
-                        Looper.loop();
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-        }.start();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+        menu.add(R.string.menu_refresh);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (current == home)
+            home.wv.reload();
+        else if (current == web)
+            web.wv.reload();
+        else if (current == ai)
+            ai.clearMessage();
+        return true;
     }
 
     @Override
@@ -235,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void run() {
                 Bitmap bitmap = binder.service.screenshot();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 64, byteArrayOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
                 ArrayList<TranslateRecord> translateRecords = new ArrayList<>();
                 JsonReader jsonReader = new JsonReader(new StringReader(new Https("https://www.titvt.com/flz/translate.php").post("language=" + language + "&image=" + URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)))));
                 try {
@@ -286,6 +296,31 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 } catch (Exception ignored) {
                 }
                 binder.service.screenshotCallback(translateRecords);
+            }
+        }.start();
+    }
+
+    private void checkVersion() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new StringReader(new Https("https://www.titvt.com/flz/version").get()));
+                    if (Integer.parseInt(bufferedReader.readLine()) > version) {
+                        final String uri = bufferedReader.readLine();
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String temp;
+                        while ((temp = bufferedReader.readLine()) != null)
+                            stringBuilder.append(temp).append('\n');
+                        Looper.prepare();
+                        new AlertDialog.Builder(MainActivity.this).setPositiveButton(R.string.ok, (dialog, which) -> {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                            Process.killProcess(Process.myPid());
+                        }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
+                        Looper.loop();
+                    }
+                } catch (Exception ignored) {
+                }
             }
         }.start();
     }

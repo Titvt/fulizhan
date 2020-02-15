@@ -6,9 +6,11 @@
     <string name="remote_refresh">刷新</string>
     <string name="remote_select">请选择局域网主机：</string>
     <string name="ai_send">发送</string>
-    <string name="trans_language">选择翻译语言：</string>
+    <string name="trans_language">截屏翻译语言：</string>
     <string name="trans_en">英语</string>
     <string name="trans_jp">日语</string>
+    <string name="trans_quality">截屏翻译图片质量：</string>
+    <string name="trans_offset">截屏翻译垂直偏移：</string>
     <string name="web_select">日语百词斩候选答案数：</string>
     <string name="remote_get">获取Windows端远控程序</string>
     <string name="menu_home">首页</string>
@@ -22,6 +24,8 @@
     <string name="menu_about">关于</string>
     <string name="menu_github">Github</string>
     <string name="menu_exit">退出</string>
+    <string name="menu_refresh">刷新页面</string>
+    <string name="menu_clear">清空消息</string>
     <string name="keyboard">键盘</string>
     <string name="keyboard_Esc">Esc</string>
     <string name="keyboard_F1">F1</string>

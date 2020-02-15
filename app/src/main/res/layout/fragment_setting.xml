@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -41,6 +42,50 @@
                 android:textSize="18sp" />
 
         </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingText"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/trans_quality" />
+
+        <EditText
+            android:id="@+id/trans_quality"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/SettingGroup">
+
+        <TextView
+            style="@style/SettingText"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/trans_offset" />
+
+        <EditText
+            android:id="@+id/trans_offset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="numberSigned"
+            tools:ignore="LabelFor" />
 
     </LinearLayout>
 

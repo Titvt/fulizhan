@@ -46,6 +46,12 @@ class AIAdapter extends RecyclerView.Adapter<AIAdapter.ViewHolder> {
         });
     }
 
+    void clearMessage() {
+        messages.clear();
+        sended.clear();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -24,7 +24,6 @@ import android.os.IBinder;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,6 +45,7 @@ public class TranslateService extends Service {
     private FrameLayout frameLayout;
     private float x, y;
     private int screenWidth, screenHeight;
+    private boolean translating;
 
     @Nullable
     @Override
@@ -59,7 +59,7 @@ public class TranslateService extends Service {
         super.onCreate();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         Point point = new Point();
-        windowManager.getDefaultDisplay().getSize(point);
+        windowManager.getDefaultDisplay().getRealSize(point);
         screenWidth = point.x;
         screenHeight = point.y;
         frameLayoutParams = new WindowManager.LayoutParams();
@@ -96,8 +96,13 @@ public class TranslateService extends Service {
             return false;
         });
         iv.setOnClickListener(v -> {
-            windowManager.removeView(iv);
-            binder.activity.screenshot();
+            if (translating)
+                windowManager.removeView(frameLayout);
+            else {
+                windowManager.removeView(iv);
+                binder.activity.screenshot();
+            }
+            translating = !translating;
         });
         windowManager.addView(iv, ivLayoutParams);
     }
@@ -139,7 +144,7 @@ public class TranslateService extends Service {
             TextView textView = new TextView(getApplicationContext());
             textView.setLayoutParams(new FrameLayout.LayoutParams(translateRecord.width, translateRecord.height));
             textView.setX(translateRecord.x);
-            textView.setY(translateRecord.y - 15);
+            textView.setY(translateRecord.y - binder.activity.offset);
             textView.setText(translateRecord.target_text);
             textView.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -149,19 +154,9 @@ public class TranslateService extends Service {
             textView.setBackground(getDrawable(R.color.white));
             frameLayout.addView(textView);
         }
-        Button button = new Button(getApplicationContext());
-        button.setLayoutParams(new FrameLayout.LayoutParams(240, 120));
-        button.setX(screenWidth / 2 - 120);
-        button.setY(screenHeight - 150);
-        button.setText("关闭");
-        button.setTextSize(18);
-        button.setTextColor(getResources().getColor(R.color.white));
-        button.setBackground(getDrawable(R.drawable.close_button));
-        button.setOnClickListener(v -> {
-            windowManager.removeView(frameLayout);
+        new Handler(getMainLooper()).post(() -> {
+            windowManager.addView(frameLayout, frameLayoutParams);
             windowManager.addView(iv, ivLayoutParams);
         });
-        frameLayout.addView(button);
-        new Handler(getMainLooper()).post(() -> windowManager.addView(frameLayout, frameLayoutParams));
     }
 }

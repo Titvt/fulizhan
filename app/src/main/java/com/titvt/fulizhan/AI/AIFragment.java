@@ -24,7 +24,7 @@ public class AIFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_ai, container, false);
-        view.findViewById(R.id.btn_send).setOnClickListener(v -> {
+        view.findViewById(R.id.ai_send).setOnClickListener(v -> {
             String string = ((EditText) view.findViewById(R.id.et)).getText().toString();
             if (string.equals(""))
                 return;
@@ -51,5 +51,9 @@ public class AIFragment extends Fragment {
         aiAdapter = new AIAdapter(getContext(), rv);
         rv.setAdapter(aiAdapter);
         return view;
+    }
+
+    public void clearMessage() {
+        aiAdapter.clearMessage();
     }
 }
