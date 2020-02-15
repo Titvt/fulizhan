@@ -32,7 +32,7 @@ public class WebFragment extends Fragment {
         wv.setWebViewClient(new WebViewClient());
         wv.setLongClickable(true);
         wv.setOnLongClickListener(v -> true);
-        wv.loadUrl("https://www.titvt.com/flz/web/main.html?num=" + sharedPreferences.getString("num", "4"));
+        wv.loadUrl("https://www.titvt.com/flz/web/?num=" + sharedPreferences.getString("num", "4"));
         return view;
     }
 }

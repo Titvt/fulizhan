@@ -25,7 +25,7 @@ public class HomeFragment extends Fragment {
         wv = view.findViewById(R.id.wv);
         wv.getSettings().setJavaScriptEnabled(true);
         wv.setWebViewClient(new WebViewClient());
-        wv.loadUrl("https://www.titvt.com/flz/home.html");
+        wv.loadUrl("https://www.titvt.com/flz/");
         return view;
     }
 }
