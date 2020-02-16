@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TranslateService extends Service {
+    private Context context;
     private TranslateBinder binder = new TranslateBinder(this);
     private ImageReader imageReader;
     private VirtualDisplay virtualDisplay;
@@ -57,6 +58,7 @@ public class TranslateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        context = getApplicationContext();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         Point point = new Point();
         windowManager.getDefaultDisplay().getRealSize(point);
@@ -74,17 +76,21 @@ public class TranslateService extends Service {
         ivLayoutParams.type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
         ivLayoutParams.width = 128;
         ivLayoutParams.height = 128;
-        ivLayoutParams.x = 0;
-        ivLayoutParams.y = 0;
+        ivLayoutParams.x = context.getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("x", 0);
+        ivLayoutParams.y = context.getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("y", 0);
         ivLayoutParams.format = PixelFormat.RGBA_8888;
         ivLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-        iv = new ImageView(getApplicationContext());
+        iv = new ImageView(context);
         iv.setImageResource(R.mipmap.ic_launcher_round);
         iv.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     x = event.getRawX();
                     y = event.getRawY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    context.getSharedPreferences("flz", Context.MODE_PRIVATE).edit().putInt("x", ivLayoutParams.x).apply();
+                    context.getSharedPreferences("flz", Context.MODE_PRIVATE).edit().putInt("y", ivLayoutParams.y).apply();
                     break;
                 case MotionEvent.ACTION_MOVE:
                     ivLayoutParams.x += event.getRawX() - x;
@@ -124,7 +130,7 @@ public class TranslateService extends Service {
         }
         MediaProjection mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
         imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 1);
-        virtualDisplay = mediaProjection.createVirtualDisplay("福利栈", screenWidth, screenHeight, getApplicationContext().getResources().getDisplayMetrics().densityDpi, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
+        virtualDisplay = mediaProjection.createVirtualDisplay("福利栈", screenWidth, screenHeight, context.getResources().getDisplayMetrics().densityDpi, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
     }
 
     public Bitmap screenshot() {
@@ -137,11 +143,9 @@ public class TranslateService extends Service {
     }
 
     public void screenshotCallback(ArrayList<TranslateRecord> translateRecords) {
-        frameLayout = new FrameLayout(getApplicationContext());
+        frameLayout = new FrameLayout(context);
         for (TranslateRecord translateRecord : translateRecords) {
-            if (translateRecord.y < 30)
-                continue;
-            TextView textView = new TextView(getApplicationContext());
+            TextView textView = new TextView(context);
             textView.setLayoutParams(new FrameLayout.LayoutParams(translateRecord.width, translateRecord.height));
             textView.setX(translateRecord.x);
             textView.setY(translateRecord.y - binder.activity.offset);

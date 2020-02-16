@@ -46,7 +46,7 @@ public class RemoteScreenActivity extends AppCompatActivity implements View.OnCl
         iv = findViewById(R.id.iv);
         host = getIntent().getStringExtra("host");
         Point point = new Point();
-        getWindowManager().getDefaultDisplay().getSize(point);
+        getWindowManager().getDefaultDisplay().getRealSize(point);
         screenWidth = point.x;
         screenHeight = point.y;
         remoteScreenHandler = new RemoteScreenHandler(iv);

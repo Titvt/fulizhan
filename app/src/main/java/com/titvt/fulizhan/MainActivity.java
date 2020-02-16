@@ -52,7 +52,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
     private static final int version = 4;
-    public String language = "en";
+    public String language;
     public int quality, offset;
     public HomeFragment home;
     public WebFragment web;
@@ -168,8 +168,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         home = new HomeFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, home).commit();
         current = home;
-        quality = Integer.parseInt(getSharedPreferences("flz", Context.MODE_PRIVATE).getString("quality", "60"));
-        offset = Integer.parseInt(getSharedPreferences("flz", Context.MODE_PRIVATE).getString("offset", "0"));
+        language = getSharedPreferences("flz", Context.MODE_PRIVATE).getString("language", "en");
+        quality = getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("quality", 60);
+        offset = getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("offset", 0);
         checkVersion();
     }
 
