@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Process;
 import android.provider.Settings;
 import android.util.Base64;
 import android.util.JsonReader;
@@ -34,14 +33,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
-import com.titvt.fulizhan.AI.AIFragment;
-import com.titvt.fulizhan.Home.HomeFragment;
-import com.titvt.fulizhan.Remote.RemoteListFragment;
-import com.titvt.fulizhan.Setting.SettingFragment;
-import com.titvt.fulizhan.Translate.TranslateBinder;
-import com.titvt.fulizhan.Translate.TranslateRecord;
-import com.titvt.fulizhan.Translate.TranslateService;
-import com.titvt.fulizhan.Web.WebFragment;
+import com.titvt.fulizhan.ai.AIFragment;
+import com.titvt.fulizhan.home.HomeFragment;
+import com.titvt.fulizhan.remote.RemoteListFragment;
+import com.titvt.fulizhan.setting.SettingFragment;
+import com.titvt.fulizhan.translate.TranslateBinder;
+import com.titvt.fulizhan.translate.TranslateRecord;
+import com.titvt.fulizhan.translate.TranslateService;
+import com.titvt.fulizhan.web.WebFragment;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkVersion();
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         language = getSharedPreferences("flz", Context.MODE_PRIVATE).getString("language", "en");
         quality = getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("quality", 60);
         offset = getSharedPreferences("flz", Context.MODE_PRIVATE).getInt("offset", 0);
-        checkVersion();
     }
 
     @Override
@@ -316,7 +315,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         Looper.prepare();
                         new AlertDialog.Builder(MainActivity.this).setPositiveButton(R.string.ok, (dialog, which) -> {
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                            Process.killProcess(Process.myPid());
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(0);
                         }).setTitle("发现新版本").setMessage(stringBuilder.toString()).setCancelable(false).show();
                         Looper.loop();
                     }

@@ -17,12 +17,12 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <service
-            android:name=".Translate.TranslateService"
+            android:name=".translate.TranslateService"
             android:foregroundServiceType="mediaProjection"
             tools:targetApi="Q" />
 
         <activity
-            android:name=".Remote.RemoteScreenActivity"
+            android:name=".remote.RemoteScreenActivity"
             android:screenOrientation="landscape" />
 
         <activity

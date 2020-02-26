@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Remote;
+package com.titvt.fulizhan.remote;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

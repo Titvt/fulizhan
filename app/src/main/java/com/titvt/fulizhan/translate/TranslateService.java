@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Translate;
+package com.titvt.fulizhan.translate;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;

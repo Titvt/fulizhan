@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.AI;
+package com.titvt.fulizhan.ai;
 
 import android.content.Context;
 import android.graphics.Bitmap;

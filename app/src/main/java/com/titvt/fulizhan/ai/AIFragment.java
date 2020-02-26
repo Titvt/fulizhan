@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.AI;
+package com.titvt.fulizhan.ai;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

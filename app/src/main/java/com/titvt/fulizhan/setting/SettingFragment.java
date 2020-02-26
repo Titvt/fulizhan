@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Setting;
+package com.titvt.fulizhan.setting;
 
 import android.content.Context;
 import android.content.Intent;

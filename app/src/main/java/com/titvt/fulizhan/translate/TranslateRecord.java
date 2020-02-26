@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Translate;
+package com.titvt.fulizhan.translate;
 
 public class TranslateRecord {
     String target_text;

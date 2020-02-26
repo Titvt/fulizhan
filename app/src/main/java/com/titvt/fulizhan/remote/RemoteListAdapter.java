@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Remote;
+package com.titvt.fulizhan.remote;
 
 import android.content.Context;
 import android.content.Intent;

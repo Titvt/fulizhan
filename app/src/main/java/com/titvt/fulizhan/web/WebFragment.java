@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Web;
+package com.titvt.fulizhan.web;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

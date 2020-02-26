@@ -1,4 +1,4 @@
-package com.titvt.fulizhan.Home;
+package com.titvt.fulizhan.home;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
