@@ -1,7 +1,9 @@
 package com.titvt.fulizhan.httpss;
 
 public interface HttpssCallback {
-    void onSuccess(HttpssResult result, int responseCode, byte[] data);
+    void onHttpssOK(byte[] data);
 
-    void onError(HttpssResult result);
+    void onHttpssFail(int responseCode);
+
+    void onHttpssError();
 }
